@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>급식 정보</title>
+<link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&display=swap" rel="stylesheet">
+		<style>
+      .sh-font{
+        font-family: 'Bagel Fat One', system-ui;
+         color: orange;
+      }
+  </style>
+  <style>
+       
+    
+  body {
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+    margin: 20px;
+  
+  }
+
+  h1 {
+      font-size: 68px;
+      font-family: 'Bagel Fat One', system-ui;
+      font-weight: bold;
+      background-color: white;
+      padding: 1px;
+      line-height: 50px;
+      margin: 1px;
+      margin-bottom: 10px;
+      display: inline-block;
+      border-radius: 50px;
+      -webkit-text-stroke: 3px black; 
+      text-stroke: 2px black; 
+      color: orange;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); 
+    }
+
+    h2 {
+      font-size: 44px;
+      font-family: 'Bagel Fat One', system-ui;
+      font-weight: bold;
+      background-color: white;
+      padding: 1px;
+     line-height: 50px;
+      margin: 1px;
+      display: inline-block;
+      border-radius: 50px;
+      -webkit-text-stroke: 3px black; 
+      text-stroke: 2px black; 
+      color: white;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); 
+    }
+
+
+  #mealInfo {
+    margin-top: 20px;
+  }
+
+  .menu {
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 1px;
+      background-color: white;
+      padding: 10px;
+      margin: 5px 0;
+    }
+
+  p {
+    font-size: 2em; 
+    margin: 2px 0;
+    font-family: 'Bagel Fat One', system-ui;
+    color: black;
+  }
+  hr {
+  border: none;
+  border-top: 3.5px dashed black;
+  margin: 5px 0;
+}
+</style>
+
+</head>
+<body>
+<p></p><h2>고등학교<h2><h1>오늘의 급식</h1><p></p>
+  <div id="mealInfo"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', getMeal);
+
+    function getMeal() {
+      const currentDate = new Date();
+      const year = currentDate.getFullYear();
+      const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+      const day = currentDate.getDate().toString().padStart(2, '0');
+      const mealDate = `${year}${month}${day}`;
+      const apiKey = 'abcd~~~'; // Api Key 기입
+      const apiUrl = `https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=${apiKey}&Type=json&pIndex=1&pSize=10&ATPT_OFCDC_SC_CODE=학교코드&SD_SCHUL_CODE=학교코드&MLSV_YMD=날짜정보기입`;
+
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => displayMealInfo(data.mealServiceDietInfo[1]?.row))
+        .catch(error => console.error('Error fetching meal information:', error));
+    }
+
+    function displayMealInfo(mealData) {
+      const mealInfoDiv = document.getElementById('mealInfo');
+      mealInfoDiv.innerHTML = '';
+
+      if (mealData && mealData.length > 0) {
+        mealData.forEach(meal => {
+          const mealType = meal.MMEAL_SC_NM;
+          const mealContent = meal.DDISH_NM.replace(/\([\d.,]+\)/g, '<br>');
+          const originInfo = meal.ORPLC_INFO;
+          const nutritionInfo = meal.NTR_INFO;
+
+          const mealInfoHTML = `<hr>
+          <div class = "menu"><h3> ${mealContent}</h3></div>
+                                <hr>`;
+
+          mealInfoDiv.innerHTML += mealInfoHTML;
+        });
+      } else {
+        mealInfoDiv.innerHTML = '<p>급식 정보가 없습니다.</p>';
+      }
+    }
+  </script>
+</body>
+</html>
